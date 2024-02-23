@@ -55,6 +55,9 @@ extern "C" {
 #include "strings/human_readable.h"
 #include "util/html/sorted_table.h"
 #include "util/varz.h"
+#include "server/alexol_family.h"
+#include "server/alex_family.h"
+
 
 using namespace std;
 using facade::ErrorReply;
@@ -2532,6 +2535,8 @@ void Service::RegisterCommands() {
   JsonFamily::Register(&registry_);
   BitOpsFamily::Register(&registry_);
   HllFamily::Register(&registry_);
+  AlexolFamily::Register(&registry_);
+  AlexFamily::Register(&registry_);
 
 #ifndef __APPLE__
   SearchFamily::Register(&registry_);

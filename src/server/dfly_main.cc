@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <memory>
+#include <fstream>
 
 #include "base/init.h"
 #include "base/proc_util.h"  // for GetKernelVersion
@@ -47,6 +48,7 @@
 #include "util/accept_server.h"
 #include "util/fibers/pool.h"
 #include "util/varz.h"
+#include "server/alex_family.h"
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -598,7 +600,59 @@ void ParseFlagsFromEnv() {
   }
 }
 
+template <typename KeyType, typename PayLoad>
+static bool LoadOsmFile(const char* filepath, std::vector<std::pair<KeyType, PayLoad>>& out_values) {
+  std::ifstream ifs(filepath, std::ios::binary);
+
+  if (!ifs.is_open()) {
+    return false;
+  }
+
+  uint32_t filesize;
+  ifs.read(reinterpret_cast<char*>(&filesize), sizeof(uint32_t));
+  
+  while (ifs) {
+    KeyType key;
+    // PayLoad payload;    
+    
+    ifs.read(reinterpret_cast<char*>(&key), sizeof(KeyType));
+    
+    if (ifs.eof()) {
+      break;
+    } else if (!ifs) {
+      std::cerr << "Error reading from file" << std::endl;
+      return false;
+    }
+
+    out_values.push_back({key, key});
+  }
+
+  ifs.close();
+  std::sort(out_values.begin(), out_values.end());
+
+  if(filesize != out_values.size())
+    return false;
+
+  return true;
+}
+
+static void LoadOsmFile() {
+  const char* osm_file = "../../osm_1m";
+  vector<pair<KeyType, PayLoad>> values;
+
+  if (!LoadOsmFile(osm_file, values)) {
+    std::cerr << "Fail to load: " << osm_file << std::endl;
+
+    std::exit(1);
+  }
+
+  alex_index.bulk_load(values.data(), values.size());
+  std::cout << "Succeed Loading: " << osm_file << std::endl;
+}
+
 int main(int argc, char* argv[]) {
+  LoadOsmFile();
+
   absl::SetProgramUsageMessage(
       R"(a modern in-memory store.
 

@@ -48,7 +48,7 @@ add_library(dragonfly_lib engine_shard_set.cc channel_store.cc
             cluster/cluster_family.cc cluster/cluster_slot_migration.cc
             cluster/cluster_shard_migration.cc cluster/outgoing_slot_migration.cc
             acl/user.cc acl/user_registry.cc acl/acl_family.cc
-            acl/validator.cc acl/helpers.cc)
+            acl/validator.cc acl/helpers.cc alexol_family.cc alex_family.cc)
 
 if (DF_ENABLE_MEMORY_TRACKING)
   target_compile_definitions(dragonfly_lib PRIVATE DFLY_ENABLE_MEMORY_TRACKING)
@@ -64,7 +64,7 @@ find_library(ZSTD_LIB NAMES libzstd.a libzstdstatic.a zstd NAMES_PER_DIR REQUIRE
 cxx_link(dfly_transaction dfly_core strings_lib TRDP::fast_float)
 cxx_link(dragonfly_lib dfly_transaction dfly_facade redis_lib awsv2_lib strings_lib html_lib
          http_client_lib absl::random_random TRDP::jsoncons ${ZSTD_LIB} TRDP::lz4
-         TRDP::croncpp)
+         TRDP::croncpp tbb)
 
 if (DF_USE_SSL)
   set(TLS_LIB tls_lib)

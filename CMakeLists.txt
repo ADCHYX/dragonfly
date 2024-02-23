@@ -5,6 +5,7 @@ include(CheckCXXCompilerFlag)
 
 enable_testing()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Set targets in folders
