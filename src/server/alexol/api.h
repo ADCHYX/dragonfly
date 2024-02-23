@@ -1,5 +1,5 @@
 #include"server/alexol/alex.h"
-#include"server/alexol/indexInterface.h"
+#include"server/indexInterface.h"
 
 // int counter = 0;
 
