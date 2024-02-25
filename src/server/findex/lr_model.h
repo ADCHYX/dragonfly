@@ -24,7 +24,7 @@ class LinearRegressionModel{
   }
 
   inline void print() const {
-    LOG(2) << "[slope, intercept]: "<<slope << ", " <<intercept;
+    // LOG(2) << "[slope, intercept]: "<<slope << ", " <<intercept;
   }
 
   // fixme

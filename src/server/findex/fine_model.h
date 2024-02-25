@@ -57,15 +57,15 @@ public:
     inline key_t get_firstkey() { return keys[0]; }
 
     void print() {
-        LOG(4)<<"[print finemodel] capacity:"<<capacity<<" -->";
-        model->print();
-        if(mobs[0]) mobs[0]->print();
-        for(size_t i=0; i<capacity; i++){
-            std::cout<<"keys["<<i<<"]: " <<keys[i] << std::endl;
-            if(mobs[i+1]) {
-                mobs[i+1]->print();
-            }
-        }
+        // LOG(4)<<"[print finemodel] capacity:"<<capacity<<" -->";
+        // model->print();
+        // if(mobs[0]) mobs[0]->print();
+        // for(size_t i=0; i<capacity; i++){
+        //     std::cout<<"keys["<<i<<"]: " <<keys[i] << std::endl;
+        //     if(mobs[i+1]) {
+        //         mobs[i+1]->print();
+        //     }
+        // }
     }
 
     result_t find(const key_t &key, val_t &val)
@@ -104,7 +104,7 @@ public:
         size_t pos;
         if(lo==hi) pos = lo;
         else pos = binary_search_branchless(keys+lo, hi-lo, key) + lo;
-        LOG(5) <<"key: "<<key <<", [pre, lo, hi, pos]: "<<pre<<", "<<lo<<", "<<hi<<", "<<pos;
+        // LOG(5) <<"key: "<<key <<", [pre, lo, hi, pos]: "<<pre<<", "<<lo<<", "<<hi<<", "<<pos;
         return result_t::ok;
     }
 
@@ -116,7 +116,7 @@ public:
             auto res = find(keys[i], dummy_val);
             if(res!=Result::ok) {
                 auto [pre, lo, hi] = this->model->predict(keys[i], capacity);
-                LOG(5)<<"[fineModel error] i: "<< i<< ", key: "<<keys[i]<<" , [pre, lo, hi]: "<<pre<<", "<<lo<<", "<<hi;  
+                // LOG(5)<<"[fineModel error] i: "<< i<< ", key: "<<keys[i]<<" , [pre, lo, hi]: "<<pre<<", "<<lo<<", "<<hi;  
                 exit(0);         
             }
         }
@@ -228,10 +228,10 @@ public:
 
     void print()
     {
-        if(isbin) lb->print(std::cout);
-        else {
-            for(int i=0; i<models.size(); i++) models[i].print();
-        }
+        // if(isbin) lb->print(std::cout);
+        // else {
+        //     for(int i=0; i<models.size(); i++) models[i].print();
+        // }
     }
 
     void self_check(){
@@ -355,7 +355,7 @@ private:
         for(int i=1; i<keys.size(); i++) {
           key_t next_p = keys[i];
           if (next_p == p){
-            LOG(5)<<"DUPLICATE keys";
+            // LOG(5)<<"DUPLICATE keys";
             exit(0);
           }
           p = next_p;

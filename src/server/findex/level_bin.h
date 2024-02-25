@@ -287,15 +287,15 @@ public:
     //================== print the bins ====================
     void print(std::ostream &os) const
     {
-        if (m_root) {
-            const root_bin* r = m_root;
-            os << "rootbin:" << "  " << r << std::endl;
-            os <<"    ";
-            for(unsigned int slot = 0; slot < r->slotuse; ++slot)
-                os << " " << r->slotkey[slot];
-            os << std::endl;
-        }
-        print_children(os);
+        // if (m_root) {
+        //     const root_bin* r = m_root;
+        //     os << "rootbin:" << "  " << r << std::endl;
+        //     os <<"    ";
+        //     for(unsigned int slot = 0; slot < r->slotuse; ++slot)
+        //         os << " " << r->slotkey[slot];
+        //     os << std::endl;
+        // }
+        // print_children(os);
     }
     void print_children(std::ostream &os) const
     {

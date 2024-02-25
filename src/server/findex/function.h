@@ -111,20 +111,20 @@ inline void parse_args(int argc, char **argv) {
     }
   }
 
-  LOG(4)<<"[micro] Read:Insert:Update:Delete:Scan = "
-            << Config.read_ratio << ":" << Config.insert_ratio << ":" << Config.update_ratio << ":"
-            << Config.delete_ratio;
+  // LOG(4)<<"[micro] Read:Insert:Update:Delete:Scan = "
+            // << Config.read_ratio << ":" << Config.insert_ratio << ":" << Config.update_ratio << ":"
+            // << Config.delete_ratio;
   double ratio_sum =
       Config.read_ratio + Config.insert_ratio + Config.delete_ratio + Config.update_ratio;
   INVARIANT(ratio_sum > 0.9999 && ratio_sum < 1.0001);  // avoid precision lost
-  LOG(4)<<"Config.runtime: "<<Config.runtime;
-  LOG(4)<<"Config.thread_num: "<<Config.thread_num;
-  LOG(4)<<"Config.benchmark: "<<Config.benchmark;
+  // LOG(4)<<"Config.runtime: "<<Config.runtime;
+  // LOG(4)<<"Config.thread_num: "<<Config.thread_num;
+  // LOG(4)<<"Config.benchmark: "<<Config.benchmark;
 }
 
 
 void load_data(){
-  LOG(2)<<"read data ...";
+  // LOG(2)<<"read data ...";
   switch (Config.benchmark) {
     case 0:
       normal_data();
@@ -140,15 +140,15 @@ void load_data(){
   }
 
     // initilize XIndex (sort keys first)
-  LOG(2)<<"sort data ...";
+  // LOG(2)<<"sort data ...";
   std::sort(exist_keys.begin(), exist_keys.end());
   exist_keys.erase(std::unique(exist_keys.begin(), exist_keys.end()), exist_keys.end());
   for(size_t i=1; i<exist_keys.size(); i++){
     assert(exist_keys[i]>exist_keys[i-1]);
   }
 
-  LOG(3) << "exist_keys.size(): "<<exist_keys.size();
-  LOG(3) << "non_exist_keys.size(): " << non_exist_keys.size();
+  // LOG(3) << "exist_keys.size(): "<<exist_keys.size();
+  // LOG(3) << "non_exist_keys.size(): " << non_exist_keys.size();
 }
 
 
@@ -200,16 +200,16 @@ void lognormal_data(){
 }
 
 void osm_data() {
-    std::vector<key_type> read_keys = read_osm<key_type>("/home/user/lpf/FINEdex/osm/osm_cellids_800M_uint64");
-    size_t size = read_keys.size();
-    LOG(2)<< "read osm: "<<size;
+    // std::vector<key_type> read_keys = read_osm<key_type>("/home/user/lpf/FINEdex/osm/osm_cellids_800M_uint64");
+    // size_t size = read_keys.size();
+    // LOG(2)<< "read osm: "<<size;
 
-    size_t num = Config.exist_num < read_keys.size()? Config.exist_num:read_keys.size();
-    exist_keys.reserve(num);
-    for(int i=0; i<num; i++){
-      //exist_keys.push_back(read_keys[size-num+i+1]);
-      exist_keys.push_back(read_keys[i]);
-    }
+    // size_t num = Config.exist_num < read_keys.size()? Config.exist_num:read_keys.size();
+    // exist_keys.reserve(num);
+    // for(int i=0; i<num; i++){
+    //   //exist_keys.push_back(read_keys[size-num+i+1]);
+    //   exist_keys.push_back(read_keys[i]);
+    // }
 }
 
 #define BUF_SIZE 2048

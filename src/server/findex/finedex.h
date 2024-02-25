@@ -33,7 +33,7 @@ class FINEdex{
     assert(keys.size() == vals.size());
     if(keys.size()==0) return;
     this->Epsilon = epsilon;
-    LOG(2) << "Training data: "<<keys.size()<<" ,Epsilon: "<<Epsilon;
+    // LOG(2) << "Training data: "<<keys.size()<<" ,Epsilon: "<<Epsilon;
 
     OptimalPLR* opt = new OptimalPLR(Epsilon-1);
     key_t p = keys[0];
@@ -44,7 +44,7 @@ class FINEdex{
     for(int i=1; i<keys.size(); i++) {
       key_t next_p = keys[i];
       if (next_p == p){
-        LOG(5)<<"DUPLICATE keys";
+        // LOG(5)<<"DUPLICATE keys";
         exit(0);
       }
       p = next_p;
@@ -64,7 +64,7 @@ class FINEdex{
     auto[cs_slope, cs_intercept] = cs.get_slope_intercept();
     append_model(cs_slope, cs_intercept, Epsilon, k_iter, v_iter, ++pos);
 
-    LOG(2) << "Training models: "<<models.size();
+    // LOG(2) << "Training models: "<<models.size();
     assert(model_keys.size() == models.size());
   }
 
@@ -75,10 +75,10 @@ class FINEdex{
   }
 
   void print() {
-    for(int i=0; i<model_keys.size(); i++){
-      LOG(3)<<"model "<<i<<" ,key:"<<model_keys[i]<<" ->";
-      models[i].print();
-    }
+    // for(int i=0; i<model_keys.size(); i++){
+    //   LOG(3)<<"model "<<i<<" ,key:"<<model_keys[i]<<" ->";
+    //   models[i].print();
+    // }
   }
 
   // =================== search the data =======================

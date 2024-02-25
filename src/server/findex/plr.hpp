@@ -259,17 +259,17 @@ public:
   }
 
   void print() {
-    LOG(3)<<"first_key: "<<first;
-    LOG(3)<<"rectangle[0]: "<<rectangle[0].x<<", "<<rectangle[0].y;
-    LOG(3)<<"rectangle[1]: "<<rectangle[1].x<<", "<<rectangle[1].y;
-    LOG(3)<<"rectangle[2]: "<<rectangle[2].x<<", "<<rectangle[2].y;
-    LOG(3)<<"rectangle[3]: "<<rectangle[3].x<<", "<<rectangle[3].y;
-    auto [min_slope, max_slope] = get_slope_range();
-    LOG(3)<<"[min_slope, max_slope]: "<< min_slope<<", "<<max_slope;
-    auto[i_x, i_y] = get_intersection();
-    LOG(3)<<"intersection: "<<i_x<<" ,"<<i_y;
-    auto[cs_slope, cs_intercept] = get_slope_intercept();
-    LOG(3)<<"[slope, intercept]: "<<cs_slope<<", "<<cs_intercept;
+    // LOG(3)<<"first_key: "<<first;
+    // LOG(3)<<"rectangle[0]: "<<rectangle[0].x<<", "<<rectangle[0].y;
+    // LOG(3)<<"rectangle[1]: "<<rectangle[1].x<<", "<<rectangle[1].y;
+    // LOG(3)<<"rectangle[2]: "<<rectangle[2].x<<", "<<rectangle[2].y;
+    // LOG(3)<<"rectangle[3]: "<<rectangle[3].x<<", "<<rectangle[3].y;
+    // auto [min_slope, max_slope] = get_slope_range();
+    // LOG(3)<<"[min_slope, max_slope]: "<< min_slope<<", "<<max_slope;
+    // auto[i_x, i_y] = get_intersection();
+    // LOG(3)<<"intersection: "<<i_x<<" ,"<<i_y;
+    // auto[cs_slope, cs_intercept] = get_slope_intercept();
+    // LOG(3)<<"[slope, intercept]: "<<cs_slope<<", "<<cs_intercept;
   }
 };
 

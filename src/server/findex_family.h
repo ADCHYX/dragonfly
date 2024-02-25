@@ -15,12 +15,15 @@ namespace dfly {
 class ConnectionContext;
 class CommandRegistry;
 
+using KeyType = uint64_t;
+using PayLoad = uint64_t;
+
 class FindexFamily {
  public:
   static void Register(CommandRegistry* registry);
 
  private:
-   static void FindexlAdd(CmdArgList args, ConnectionContext* cntx);
+   static void FindexAdd(CmdArgList args, ConnectionContext* cntx);
    static void FindexGet(CmdArgList args, ConnectionContext* cntx);
    static void FindexDel(CmdArgList args, ConnectionContext* cntx);
 };

@@ -19,49 +19,98 @@ namespace {
 
 finedexInterface<uint64_t,uint64_t> findex;
 
-OpResult<uint32_t> OpAdd(const OpArgs& op_args, string_view key, string_view value) {
-  uint32_t k,v;
-  try{
-    std::string str_k(key);
-    std::string str_v(value);
-    k = std::stoul(str_k);
-    v = std::stoul(str_v);
-  } catch (const std::exception& e) {
-    return OpStatus::WRONG_TYPE;
-  }
-  findex.put(k,v);
-  return OpStatus::OK;
+OpStatus convert(string_view from, KeyType& to) {
+    try {
+        to = std::stoull(std::string{from});
+
+        return OpStatus::OK;
+    } catch (const std::invalid_argument&) {
+        return OpStatus::WRONG_TYPE;
+    } catch (const std::out_of_range&) {
+        return OpStatus::OUT_OF_RANGE;
+    }
 }
 
-OpResult<uint32_t> OpGet(const OpArgs& op_args, string_view key) {
-  uint32_t k,v;
-  try{
-    std::string str_k(key);
-    k = std::stoul(str_k);
-  } catch (const std::exception& e) {
-    return OpStatus::WRONG_TYPE;
-  }
+#define CONVERT_CHECK(from, to) do {                                    \
+    if (auto status = convert((from), (to)); status != OpStatus::OK) {  \
+        return status;                                                  \
+    }                                                                   \
+} while (0)
+
+OpResult<uint32_t> OpAdd(const OpArgs& op_args, string_view key, string_view value) {
+  // uint32_t k,v;
+  // try{
+  //   std::string str_k(key);
+  //   std::string str_v(value);
+  //   k = std::stoul(str_k);
+  //   v = std::stoul(str_v);
+  // } catch (const std::exception& e) {
+  //   return OpStatus::WRONG_TYPE;
+  // }
+  // findex.put(k,v);
+  // return OpStatus::OK;
+
+    KeyType k;
+    PayLoad v;
+
+    CONVERT_CHECK(key, k);
+    CONVERT_CHECK(value, v);
+
+    findex.put(k,v);
+
+    return OpStatus::OK;
+}
+
+OpResult<PayLoad> OpGet(const OpArgs& op_args, string_view key) {
+  // uint64_t k,v;
+  // try{
+  //   std::string str_k(key);
+  //   k = std::stoul(str_k);
+  // } catch (const std::exception& e) {
+  //   return OpStatus::WRONG_TYPE;
+  // }
+  // auto it = findex.get(k,v);
+  // if(it == false)
+  //   return OpStatus::KEY_NOTFOUND;
+  // return v;
+
+  KeyType k;
+  PayLoad v;
+
+  CONVERT_CHECK(key, k);
+
   auto it = findex.get(k,v);
-  if(it == false)
+
+  if (it == false) {
     return OpStatus::KEY_NOTFOUND;
+  }
+    
   return v;
 }
 
 OpResult<uint32_t> OpDel(const OpArgs& op_args, string_view key) {
-  uint32_t k,v;
-  try{
-    std::string str_k(key);
-    k = std::stoul(str_k);
-  } catch (const std::exception& e) {
-    return OpStatus::WRONG_TYPE;
-  }
+  // uint64_t k,v;
+  // try{
+  //   std::string str_k(key);
+  //   k = std::stoul(str_k);
+  // } catch (const std::exception& e) {
+  //   return OpStatus::WRONG_TYPE;
+  // }
+  // auto res = findex.remove(k);
+  // return res;
+
+  KeyType k;
+  
+  CONVERT_CHECK(key, k);
+
   auto res = findex.remove(k);
+
   return res;
 }
 
 }  // namespace
 
-void FindexFamily::FindexlAdd(CmdArgList args, ConnectionContext* cntx) {
+void FindexFamily::FindexAdd(CmdArgList args, ConnectionContext* cntx) {
   string_view key = ArgS(args, 0);
   string_view value = ArgS(args, 1);
 
@@ -84,7 +133,7 @@ void FindexFamily::FindexGet(CmdArgList args, ConnectionContext* cntx) {
     return OpGet(t->GetOpArgs(shard), key);
   };
 
-  OpResult<uint32_t> result = cntx->transaction->ScheduleSingleHopT(std::move(cb));
+  OpResult<PayLoad> result = cntx->transaction->ScheduleSingleHopT(std::move(cb));
 
   cntx->SendLong(*result);
 }

@@ -46,19 +46,19 @@ enum loglevel {
 
 // logging macro definiations
 // default log
-#define LOG(n)                                                            \
-  if (n >= LOG_LEVEL)                                                     \
-  ::finedex::MessageLogger((char *)__FILE__, __LINE__, n).stream()
+// #define LOG(n)                                                            \
+//   if (n >= LOG_LEVEL)                                                     \
+//   ::finedex::MessageLogger((char *)__FILE__, __LINE__, n).stream()
 
 // log with tag
-#define TLOG(n, t)                                                        \
-  if (n >= LOG_LEVEL)                                                     \
-  ::finedex::MessageLogger((char *)__FILE__, __LINE__, n).stream()              \
-      << "[" << (t) << "]"
+// #define TLOG(n, t)                                                        \
+//   if (n >= LOG_LEVEL)                                                     \
+//   ::finedex::MessageLogger((char *)__FILE__, __LINE__, n).stream()              \
+//       << "[" << (t) << "]"
 
-#define LOG_IF(n, condition)                                              \
-  if (n >= LOG_LEVEL && (condition))                                      \
-  ::finedex::MessageLogger((char *)__FILE__, __LINE__, n).stream()
+// #define LOG_IF(n, condition)                                              \
+//   if (n >= LOG_LEVEL && (condition))                                      \
+//   ::finedex::MessageLogger((char *)__FILE__, __LINE__, n).stream()
 
 #define ASSERT(condition)                                                 \
   if (unlikely(!(condition)))                                                  \
@@ -66,7 +66,7 @@ enum loglevel {
           .stream()                                                            \
       << "Assertion! "
 
-#define VERIFY(n, condition) LOG_IF(n, (!(condition)))
+// #define VERIFY(n, condition) LOG_IF(n, (!(condition)))
 
 class MessageLogger {
 public:
