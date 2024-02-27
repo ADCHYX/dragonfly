@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include "server/findex/level_bin.h"
-#include "server/findex/lr_model.h"
-#include "server/findex/util.h"
-#include "server/findex/plr.hpp"
+#include "server/finedex/level_bin.h"
+#include "server/finedex/lr_model.h"
+#include "server/finedex/util.h"
+#include "server/finedex/plr.hpp"
 
 namespace finedex{
 

@@ -137,6 +137,7 @@ void AlexFamily::Register(CommandRegistry* registry) {
       << CI{"ALEXADD", CO::WRITE | CO::FAST | CO::DENYOOM, 3, 1, 1, acl::kAlexAdd}.HFUNC(AlexAdd)
       << CI{"ALEXGET", CO::READONLY | CO::FAST, 2, 1, 1, acl::kAlexGet}.HFUNC(AlexGet)
       << CI{"ALEXDEL", CO::WRITE | CO::FAST, 2, 1, 1, acl::kAlexDel}.HFUNC(AlexDel);
+    // std::cout<<"alex register"<<std::endl;
 }
 
 alex::Alex<KeyType, PayLoad> alex_index;

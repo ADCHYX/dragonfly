@@ -18,45 +18,48 @@ using namespace facade;
 namespace {
 
 // alex::Alex<uint32_t,uint32_t> alexindex;
-alexolInterface<uint32_t,uint32_t> alexindex;
+alexolInterface<KeyType,PayLoad> alexol_index;
 
 OpResult<uint32_t> OpAdd(const OpArgs& op_args, string_view key, string_view value) {
-  uint32_t k,v;
+  KeyType k;
+  PayLoad v;
   try{
     std::string str_k(key);
     std::string str_v(value);
-    k = std::stoul(str_k);
-    v = std::stoul(str_v);
+    k = std::stoull(str_k);
+    v = std::stoull(str_v);
   } catch (const std::exception& e) {
     return OpStatus::WRONG_TYPE;
   }
-  alexindex.put(k,v);
+  alexol_index.put(k,v);
   return OpStatus::OK;
 }
 
-OpResult<uint32_t> OpGet(const OpArgs& op_args, string_view key) {
-  uint32_t k,v;
+OpResult<PayLoad> OpGet(const OpArgs& op_args, string_view key) {
+  KeyType k;
+  PayLoad v;
   try{
     std::string str_k(key);
-    k = std::stoul(str_k);
+    k = std::stoull(str_k);
   } catch (const std::exception& e) {
     return OpStatus::WRONG_TYPE;
   }
-  auto it = alexindex.get(k,v);
+  auto it = alexol_index.get(k,v);
   if(it == false)
     return OpStatus::KEY_NOTFOUND;
   return v;
 }
 
 OpResult<uint32_t> OpDel(const OpArgs& op_args, string_view key) {
-  uint32_t k,v;
+  KeyType k;
+  PayLoad v;
   try{
     std::string str_k(key);
-    k = std::stoul(str_k);
+    k = std::stoull(str_k);
   } catch (const std::exception& e) {
     return OpStatus::WRONG_TYPE;
   }
-  auto res = alexindex.remove(k);
+  auto res = alexol_index.remove(k);
   return res;
 }
 
@@ -85,7 +88,7 @@ void AlexolFamily::AlexolGet(CmdArgList args, ConnectionContext* cntx) {
     return OpGet(t->GetOpArgs(shard), key);
   };
 
-  OpResult<uint32_t> result = cntx->transaction->ScheduleSingleHopT(std::move(cb));
+  OpResult<PayLoad> result = cntx->transaction->ScheduleSingleHopT(std::move(cb));
 
   cntx->SendLong(*result);
 }

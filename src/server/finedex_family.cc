@@ -1,4 +1,4 @@
-#include "server/findex_family.h"
+#include "server/finedex_family.h"
 
 extern "C" {
 #include "redis/object.h"
@@ -16,8 +16,6 @@ using namespace std;
 using namespace facade;
 
 namespace {
-
-finedexInterface<uint64_t,uint64_t> findex;
 
 OpStatus convert(string_view from, KeyType& to) {
     try {
@@ -38,79 +36,38 @@ OpStatus convert(string_view from, KeyType& to) {
 } while (0)
 
 OpResult<uint32_t> OpAdd(const OpArgs& op_args, string_view key, string_view value) {
-  // uint32_t k,v;
-  // try{
-  //   std::string str_k(key);
-  //   std::string str_v(value);
-  //   k = std::stoul(str_k);
-  //   v = std::stoul(str_v);
-  // } catch (const std::exception& e) {
-  //   return OpStatus::WRONG_TYPE;
-  // }
-  // findex.put(k,v);
-  // return OpStatus::OK;
-
     KeyType k;
     PayLoad v;
-
     CONVERT_CHECK(key, k);
     CONVERT_CHECK(value, v);
 
-    findex.put(k,v);
-
+    finedex_index.put(k,v);
     return OpStatus::OK;
 }
 
 OpResult<PayLoad> OpGet(const OpArgs& op_args, string_view key) {
-  // uint64_t k,v;
-  // try{
-  //   std::string str_k(key);
-  //   k = std::stoul(str_k);
-  // } catch (const std::exception& e) {
-  //   return OpStatus::WRONG_TYPE;
-  // }
-  // auto it = findex.get(k,v);
-  // if(it == false)
-  //   return OpStatus::KEY_NOTFOUND;
-  // return v;
-
   KeyType k;
   PayLoad v;
-
   CONVERT_CHECK(key, k);
 
-  auto it = findex.get(k,v);
-
+  auto it = finedex_index.get(k,v);
   if (it == false) {
     return OpStatus::KEY_NOTFOUND;
   }
-    
   return v;
 }
 
 OpResult<uint32_t> OpDel(const OpArgs& op_args, string_view key) {
-  // uint64_t k,v;
-  // try{
-  //   std::string str_k(key);
-  //   k = std::stoul(str_k);
-  // } catch (const std::exception& e) {
-  //   return OpStatus::WRONG_TYPE;
-  // }
-  // auto res = findex.remove(k);
-  // return res;
-
   KeyType k;
-  
   CONVERT_CHECK(key, k);
 
-  auto res = findex.remove(k);
-
+  auto res = finedex_index.remove(k);
   return res;
 }
 
 }  // namespace
 
-void FindexFamily::FindexAdd(CmdArgList args, ConnectionContext* cntx) {
+void FinedexFamily::FinedexAdd(CmdArgList args, ConnectionContext* cntx) {
   string_view key = ArgS(args, 0);
   string_view value = ArgS(args, 1);
 
@@ -126,7 +83,7 @@ void FindexFamily::FindexAdd(CmdArgList args, ConnectionContext* cntx) {
   cntx->SendError(result.status());
 }
 
-void FindexFamily::FindexGet(CmdArgList args, ConnectionContext* cntx) {
+void FinedexFamily::FinedexGet(CmdArgList args, ConnectionContext* cntx) {
   string_view key = ArgS(args, 0);
 
   auto cb = [&](Transaction* t, EngineShard* shard) {
@@ -138,7 +95,7 @@ void FindexFamily::FindexGet(CmdArgList args, ConnectionContext* cntx) {
   cntx->SendLong(*result);
 }
 
-void FindexFamily::FindexDel(CmdArgList args, ConnectionContext* cntx) {
+void FinedexFamily::FinedexDel(CmdArgList args, ConnectionContext* cntx) {
   string_view key = ArgS(args, 0);
 
   auto cb = [&](Transaction* t, EngineShard* shard) {
@@ -159,17 +116,20 @@ using CI = CommandId;
 #define HFUNC(x) SetHandler(&x)
 
 namespace acl {
-constexpr uint32_t kFindexAdd = WRITE | SET | FAST;
-constexpr uint32_t kFindexGet = READ | SET | FAST;
-constexpr uint32_t kFindexDel = WRITE | SET | FAST;
+constexpr uint32_t kFinedexAdd = WRITE | SET | FAST;
+constexpr uint32_t kFinedexGet = READ | SET | FAST;
+constexpr uint32_t kFinedexDel = WRITE | SET | FAST;
 }  // namespace acl
 
-void FindexFamily::Register(CommandRegistry* registry) {
+void FinedexFamily::Register(CommandRegistry* registry) {
   registry->StartFamily();
   *registry
-      << CI{"FindexADD", CO::WRITE | CO::FAST | CO::DENYOOM, 3, 1, 1, acl::kFindexAdd}.HFUNC(FindexAdd)
-      << CI{"FindexGET", CO::READONLY | CO::FAST, 2, 1, 1, acl::kFindexGet}.HFUNC(FindexGet)
-      << CI{"FindexDEL", CO::WRITE | CO::FAST, 2, 1, 1, acl::kFindexDel}.HFUNC(FindexDel);
+      << CI{"FINEDEXADD", CO::WRITE | CO::FAST | CO::DENYOOM, 3, 1, 1, acl::kFinedexAdd}.HFUNC(FinedexAdd)
+      << CI{"FINEDEXGET", CO::READONLY | CO::FAST, 2, 1, 1, acl::kFinedexGet}.HFUNC(FinedexGet)
+      << CI{"FINEDEXDEL", CO::WRITE | CO::FAST, 2, 1, 1, acl::kFinedexDel}.HFUNC(FinedexDel);
+  // std::cout<<"finedex register"<<std::endl;
 }
+
+finedexInterface<KeyType,PayLoad> finedex_index;
 
 }  // namespace dfly

@@ -8,7 +8,7 @@
 
 #include "facade/op_status.h"
 #include "server/common.h"
-#include "server/findex/findex_api.h"
+#include "server/finedex/finedex_api.h"
 
 namespace dfly {
 
@@ -18,14 +18,16 @@ class CommandRegistry;
 using KeyType = uint64_t;
 using PayLoad = uint64_t;
 
-class FindexFamily {
+class FinedexFamily {
  public:
   static void Register(CommandRegistry* registry);
 
  private:
-   static void FindexAdd(CmdArgList args, ConnectionContext* cntx);
-   static void FindexGet(CmdArgList args, ConnectionContext* cntx);
-   static void FindexDel(CmdArgList args, ConnectionContext* cntx);
+   static void FinedexAdd(CmdArgList args, ConnectionContext* cntx);
+   static void FinedexGet(CmdArgList args, ConnectionContext* cntx);
+   static void FinedexDel(CmdArgList args, ConnectionContext* cntx);
 };
+
+extern finedexInterface<KeyType,PayLoad> finedex_index;
 
 }  // namespace dfly

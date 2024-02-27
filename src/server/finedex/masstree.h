@@ -1,7 +1,7 @@
 #if !defined(__MASSTREE_H__)
 #define __MASSTREE_H__
 
-#include "server/findex/util.h"
+#include "server/finedex/util.h"
 
 namespace finedex {
 

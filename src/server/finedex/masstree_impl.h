@@ -5,7 +5,7 @@
 #include <mutex>
 #include <vector>
 
-#include "server/findex/masstree.h"
+#include "server/finedex/masstree.h"
 
 namespace finedex {
 

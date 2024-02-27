@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "server/findex/logging.hh"
+#include "server/finedex/logging.hh"
 
 namespace finedex {
 

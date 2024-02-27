@@ -1,5 +1,5 @@
-#include "server/findex/function.h"
-#include "server/findex/finedex.h"
+#include "server/finedex/function.h"
+#include "server/finedex/finedex.h"
 #include "server/indexInterface.h"
 
 template<class KEY_TYPE, class PAYLOAD_TYPE>

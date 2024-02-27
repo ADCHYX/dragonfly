@@ -15,6 +15,9 @@ namespace dfly {
 class ConnectionContext;
 class CommandRegistry;
 
+using KeyType = uint64_t;
+using PayLoad = uint64_t;
+
 class AlexolFamily {
  public:
   static void Register(CommandRegistry* registry);
@@ -25,5 +28,7 @@ class AlexolFamily {
    static void AlexolGet(CmdArgList args, ConnectionContext* cntx);
    static void AlexolDel(CmdArgList args, ConnectionContext* cntx);
 };
+
+extern alexolInterface<KeyType,PayLoad> alexol_index;
 
 }  // namespace dfly

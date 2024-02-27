@@ -1,10 +1,10 @@
 #pragma once
 
-#include "server/findex/util.h"
-#include "server/findex/fine_model.h"
-#include "server/findex/plr.hpp"
-#include "server/findex/masstree.h"
-#include "server/findex/masstree_impl.h"
+#include "server/finedex/util.h"
+#include "server/finedex/fine_model.h"
+#include "server/finedex/plr.hpp"
+#include "server/finedex/masstree.h"
+#include "server/finedex/masstree_impl.h"
 
 namespace finedex{
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "server/findex/util.h"
+#include "server/finedex/util.h"
 
 namespace finedex{
 

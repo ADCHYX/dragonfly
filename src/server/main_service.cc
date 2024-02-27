@@ -57,7 +57,7 @@ extern "C" {
 #include "util/varz.h"
 #include "server/alexol_family.h"
 #include "server/alex_family.h"
-#include "server/findex_family.h"
+#include "server/finedex_family.h"
 
 
 using namespace std;
@@ -2538,7 +2538,7 @@ void Service::RegisterCommands() {
   HllFamily::Register(&registry_);
   AlexolFamily::Register(&registry_);
   AlexFamily::Register(&registry_);
-  FindexFamily::Register(&registry_);
+  FinedexFamily::Register(&registry_);
 
 #ifndef __APPLE__
   SearchFamily::Register(&registry_);

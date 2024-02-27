@@ -1,26 +1,27 @@
-#include "server/findex/util.h"
-#include "server/findex/logging.hh"
+#include "server/finedex/util.h"
+#include "server/finedex/logging.hh"
 
 namespace finedex{
 
 typedef uint64_t key_type;
 typedef uint64_t val_type;
 
-std::vector<key_type> exist_keys;
-std::vector<key_type> non_exist_keys;
+static std::vector<key_type> exist_keys;
+static std::vector<key_type> non_exist_keys;
 
 inline void load_data();
 inline void parse_args(int, char **);
 
-void normal_data();
-void lognormal_data();
-void osm_data();
+static void normal_data();
+static void lognormal_data();
+static void osm_data();
+
 template<typename key_type>
 std::vector<key_type> read_osm(const char *path);
 
 
 // parameters
-struct config{
+static struct config{
 	double read_ratio = 0;
 	double insert_ratio = 1;
 	double update_ratio = 0;

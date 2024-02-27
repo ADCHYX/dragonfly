@@ -49,6 +49,8 @@
 #include "util/fibers/pool.h"
 #include "util/varz.h"
 #include "server/alex_family.h"
+#include "server/alexol_family.h"
+#include "server/finedex_family.h"
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -637,7 +639,7 @@ static bool LoadOsmFile(const char* filepath, std::vector<std::pair<KeyType, Pay
 }
 
 static void LoadOsmFile() {
-  const char* osm_file = "../../osm_1m";
+  const char* osm_file = "../../osm_bulk";
   vector<pair<KeyType, PayLoad>> values;
 
   if (!LoadOsmFile(osm_file, values)) {
@@ -647,6 +649,8 @@ static void LoadOsmFile() {
   }
 
   alex_index.bulk_load(values.data(), values.size());
+  //alexol_index.bulk_load(values.data(), values.size());
+  finedex_index.bulk_load(values.data(), values.size());
   std::cout << "Succeed Loading: " << osm_file << std::endl;
 }
 
