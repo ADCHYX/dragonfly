@@ -649,7 +649,7 @@ static void LoadOsmFile() {
   }
 
   alex_index.bulk_load(values.data(), values.size());
-  //alexol_index.bulk_load(values.data(), values.size());
+  alexol_index.bulk_load(values.data(), values.size());
   finedex_index.bulk_load(values.data(), values.size());
   std::cout << "Succeed Loading: " << osm_file << std::endl;
 }
