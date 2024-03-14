@@ -15,8 +15,8 @@ namespace dfly {
 class ConnectionContext;
 class CommandRegistry;
 
-using KeyType = uint64_t;
-using PayLoad = uint64_t;
+using FinedexKeyType = uint64_t;
+using FinedexPayLoad = uint64_t;
 
 class FinedexFamily {
  public:
@@ -28,6 +28,6 @@ class FinedexFamily {
    static void FinedexDel(CmdArgList args, ConnectionContext* cntx);
 };
 
-extern finedexInterface<KeyType,PayLoad> finedex_index;
+extern finedexInterface<FinedexKeyType, FinedexPayLoad> finedex_index;
 
 }  // namespace dfly

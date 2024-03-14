@@ -17,7 +17,6 @@ using namespace facade;
 
 namespace {
 
-// alex::Alex<uint32_t,uint32_t> alexindex;
 alexolInterface<KeyType,PayLoad> alexol_index;
 
 OpResult<uint32_t> OpAdd(const OpArgs& op_args, string_view key, string_view value) {

@@ -1,4 +1,5 @@
-#include "server/finedex_family.h"
+#include "server/sali_family.h"
+#include "server/sali/sali.h"
 
 extern "C" {
 #include "redis/object.h"
@@ -15,11 +16,11 @@ namespace dfly {
 using namespace std;
 using namespace facade;
 
-finedexInterface<FinedexKeyType, FinedexPayLoad> finedex_index;
-
 namespace {
 
-OpStatus convert(string_view from, FinedexKeyType& to) {
+static sali::SALI<SaliKeyType, SaliPayLoad> SaliIndex;
+
+OpStatus convert(string_view from, SaliKeyType& to) {
     try {
         to = std::stoull(std::string{from});
 
@@ -38,26 +39,26 @@ OpStatus convert(string_view from, FinedexKeyType& to) {
 } while (0)
 
 static OpResult<uint32_t> OpAdd(const OpArgs& op_args, string_view key, string_view value) {
-    FinedexKeyType k;
-    FinedexPayLoad v;
+    SaliKeyType k;
+    SaliPayLoad v;
 
     CONVERT_CHECK(key, k);
     CONVERT_CHECK(value, v);
 
-    finedex_index.put(k,v);
+    SaliIndex.insert(k,v);
 
     return OpStatus::OK;
 }
 
-static OpResult<FinedexPayLoad> OpGet(const OpArgs& op_args, string_view key) {
-  FinedexKeyType k;
-  FinedexPayLoad v;
+static OpResult<SaliPayLoad> OpGet(const OpArgs& op_args, string_view key) {
+  SaliKeyType k;
+  SaliPayLoad v;
 
   CONVERT_CHECK(key, k);
 
-  auto it = finedex_index.get(k,v);
+  auto it = SaliIndex.at(k,v);
 
-  if (it == false) {
+  if (!it) {
     return OpStatus::KEY_NOTFOUND;
   }
     
@@ -65,18 +66,18 @@ static OpResult<FinedexPayLoad> OpGet(const OpArgs& op_args, string_view key) {
 }
 
 static OpResult<uint32_t> OpDel(const OpArgs& op_args, string_view key) {
-  FinedexKeyType k;
+  SaliKeyType k;
   
   CONVERT_CHECK(key, k);
 
-  auto res = finedex_index.remove(k);
+  auto res = SaliIndex.remove(k);
 
   return res;
 }
 
 }  // namespace
 
-void FinedexFamily::FinedexAdd(CmdArgList args, ConnectionContext* cntx) {
+void SaliFamily::SaliAdd(CmdArgList args, ConnectionContext* cntx) {
   string_view key = ArgS(args, 0);
   string_view value = ArgS(args, 1);
 
@@ -92,19 +93,19 @@ void FinedexFamily::FinedexAdd(CmdArgList args, ConnectionContext* cntx) {
   cntx->SendError(result.status());
 }
 
-void FinedexFamily::FinedexGet(CmdArgList args, ConnectionContext* cntx) {
+void SaliFamily::SaliGet(CmdArgList args, ConnectionContext* cntx) {
   string_view key = ArgS(args, 0);
 
   auto cb = [&](Transaction* t, EngineShard* shard) {
     return OpGet(t->GetOpArgs(shard), key);
   };
 
-  OpResult<FinedexPayLoad> result = cntx->transaction->ScheduleSingleHopT(std::move(cb));
+  OpResult<SaliPayLoad> result = cntx->transaction->ScheduleSingleHopT(std::move(cb));
 
   cntx->SendLong(*result);
 }
 
-void FinedexFamily::FinedexDel(CmdArgList args, ConnectionContext* cntx) {
+void SaliFamily::SaliDel(CmdArgList args, ConnectionContext* cntx) {
   string_view key = ArgS(args, 0);
 
   auto cb = [&](Transaction* t, EngineShard* shard) {
@@ -125,17 +126,17 @@ using CI = CommandId;
 #define HFUNC(x) SetHandler(&x)
 
 namespace acl {
-constexpr uint32_t kFinedexAdd = WRITE | SET | FAST;
-constexpr uint32_t kFinedexGet = READ | SET | FAST;
-constexpr uint32_t kFinedexDel = WRITE | SET | FAST;
+constexpr uint32_t kSaliAdd = WRITE | SET | FAST;
+constexpr uint32_t kSaliGet = READ | SET | FAST;
+constexpr uint32_t kSaliDel = WRITE | SET | FAST;
 }  // namespace acl
 
-void FinedexFamily::Register(CommandRegistry* registry) {
+void SaliFamily::Register(CommandRegistry* registry) {
   registry->StartFamily();
   *registry
-      << CI{"FINEDEXADD", CO::WRITE | CO::FAST | CO::DENYOOM, 3, 1, 1, acl::kFinedexAdd}.HFUNC(FinedexAdd)
-      << CI{"FINEDEXGET", CO::READONLY | CO::FAST, 2, 1, 1, acl::kFinedexGet}.HFUNC(FinedexGet)
-      << CI{"FINEDEXDEL", CO::WRITE | CO::FAST, 2, 1, 1, acl::kFinedexDel}.HFUNC(FinedexDel);
+      << CI{"SALIADD", CO::WRITE | CO::FAST | CO::DENYOOM, 3, 1, 1, acl::kSaliAdd}.HFUNC(SaliAdd)
+      << CI{"SALIGET", CO::READONLY | CO::FAST, 2, 1, 1, acl::kSaliGet}.HFUNC(SaliGet)
+      << CI{"SALIDEL", CO::WRITE | CO::FAST, 2, 1, 1, acl::kSaliDel}.HFUNC(SaliDel);
 }
 
 }  // namespace dfly
