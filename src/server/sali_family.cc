@@ -1,5 +1,4 @@
 #include "server/sali_family.h"
-#include "server/sali/sali.h"
 
 extern "C" {
 #include "redis/object.h"
@@ -16,9 +15,9 @@ namespace dfly {
 using namespace std;
 using namespace facade;
 
-namespace {
+sali::SALI<SaliKeyType, SaliPayLoad> sali_index;
 
-static sali::SALI<SaliKeyType, SaliPayLoad> SaliIndex;
+namespace {
 
 OpStatus convert(string_view from, SaliKeyType& to) {
     try {
@@ -45,7 +44,9 @@ static OpResult<uint32_t> OpAdd(const OpArgs& op_args, string_view key, string_v
     CONVERT_CHECK(key, k);
     CONVERT_CHECK(value, v);
 
-    SaliIndex.insert(k,v);
+    if (!sali_index.exists(k)) {
+      sali_index.insert(k,v);
+    }
 
     return OpStatus::OK;
 }
@@ -56,7 +57,7 @@ static OpResult<SaliPayLoad> OpGet(const OpArgs& op_args, string_view key) {
 
   CONVERT_CHECK(key, k);
 
-  auto it = SaliIndex.at(k,v);
+  auto it = sali_index.at(k,v);
 
   if (!it) {
     return OpStatus::KEY_NOTFOUND;
@@ -70,7 +71,7 @@ static OpResult<uint32_t> OpDel(const OpArgs& op_args, string_view key) {
   
   CONVERT_CHECK(key, k);
 
-  auto res = SaliIndex.remove(k);
+  auto res = sali_index.remove(k);
 
   return res;
 }

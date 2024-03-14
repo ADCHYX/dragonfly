@@ -59,12 +59,12 @@ namespace sali {
         }
   };
 
-  void yield(int count) {
-    if (count>3)
-      sched_yield();
-    else
-      _mm_pause();
-  }
+  // void yield(int count) {
+  //   if (count>3)
+  //     sched_yield();
+  //   else
+  //     _mm_pause();
+  // }
 
   // optimistic lock implementation is based on https://github.com/wangziqi2016/index-microbench/blob/master/BTreeOLC/BTreeOLC_child_layout.h
   struct OptLock {

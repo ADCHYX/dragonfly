@@ -6,6 +6,7 @@
 
 #include "facade/op_status.h"
 #include "server/common.h"
+#include "server/sali/sali.h"
 
 namespace dfly {
 
@@ -25,5 +26,6 @@ class SaliFamily {
    static void SaliDel(CmdArgList args, ConnectionContext* cntx);
 };
 
+extern sali::SALI<SaliKeyType, SaliPayLoad> sali_index;
 
 }  // namespace dfly

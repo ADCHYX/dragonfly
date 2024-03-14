@@ -4,7 +4,6 @@
 #include <random>
 #include "concurrency.h"
 #include "sali_base.h"
-#include "omp.h"
 #include "tbb/combinable.h"
 #include "tbb/enumerable_thread_specific.h"
 #include "tbb/spin_mutex.h"
@@ -24,7 +23,8 @@
 #include <unordered_set>
 #include <future>
 #include <unistd.h>
-#include "piecewise_linear_model.h"
+#include "server/sali/piecewise_linear_model.h"
+#include "server/sali/patch.h"
 
 
 #define likely(x) __builtin_expect(!!(x), 1)
@@ -45,7 +45,7 @@ static int max_ratio = 0;
   {                                                                            \
     if (!(expr)) {                                                             \
       fprintf(stderr, "Thread %d: RT_ASSERT Error at %s:%d, `%s` not hold!\n", \
-              omp_get_thread_num(), __FILE__, __LINE__, #expr);                \
+              ThreadInfo::omp_get_thread_num(), __FILE__, __LINE__, #expr);                \
       exit(0);                                                                 \
     }                                                                          \
   }
@@ -66,13 +66,13 @@ typedef void (*dealloc_func)(void *ptr);
 #define WHITE "\033[37m"   /* White */
 
 #define RT_DEBUG(msg, ...)                                                     \
-  if (omp_get_thread_num() == 0) {                                             \
-    printf(GREEN "T%d: " msg RESET "\n", omp_get_thread_num(), __VA_ARGS__);   \
-  } else if (omp_get_thread_num() == 1) {                                      \
-    printf(YELLOW "\t\t\tT%d: " msg RESET "\n", omp_get_thread_num(),          \
+  if (ThreadInfo::omp_get_thread_num() == 0) {                                             \
+    printf(GREEN "T%d: " msg RESET "\n", ThreadInfo::omp_get_thread_num(), __VA_ARGS__);   \
+  } else if (ThreadInfo::omp_get_thread_num() == 1) {                                      \
+    printf(YELLOW "\t\t\tT%d: " msg RESET "\n", ThreadInfo::omp_get_thread_num(),          \
            __VA_ARGS__);                                                       \
   } else {                                                                     \
-    printf(BLUE "\t\t\t\t\t\tT%d: " msg RESET "\n", omp_get_thread_num(),      \
+    printf(BLUE "\t\t\t\t\t\tT%d: " msg RESET "\n", ThreadInfo::omp_get_thread_num(),      \
            __VA_ARGS__);                                                       \
   }
 #else
@@ -214,7 +214,7 @@ public:
               //node->num_inserts = node->num_insert_to_data = 0;
               for (int i = 0; i < node->num_items; i++) node->items[i].typeVersionLockObsolete.store(0b100);
               for (int i = 0; i < node->num_items; i++) node->items[i].entry_type = 0;
-              tree->pending_two[omp_get_thread_num()].push(node);
+              tree->pending_two[ThreadInfo::omp_get_thread_num()].push(node);
             } else {
               tree->delete_items(node->items, node->num_items);
               tree->delete_nodes(node, 1);
@@ -286,7 +286,7 @@ public:
               //node->num_inserts = node->num_insert_to_data = 0;
               for (int i = 0; i < node->num_items; i++) node->items[i].typeVersionLockObsolete.store(0b100);
               for (int i = 0; i < node->num_items; i++) node->items[i].entry_type = 0;
-              tree->pending_two[omp_get_thread_num()].push(node);
+              tree->pending_two[ThreadInfo::omp_get_thread_num()].push(node);
             } else {
               freed_size += node->num_items * sizeof(Item);
               freed_size += sizeof(Node);
@@ -356,7 +356,7 @@ public:
 
         if (!QUIET) {
           printf("initial memory pool size = %lu\n",
-                 pending_two[omp_get_thread_num()].size());
+                 pending_two[ThreadInfo::omp_get_thread_num()].size());
         }
       }
       if (USE_FMCD && !QUIET) {
@@ -1552,7 +1552,7 @@ private:
 
     Node *new_nodes(int n) {
       Node *p = node_allocator.allocate(n);
-      al[omp_get_thread_num()].field += n * sizeof(Node);
+      al[ThreadInfo::omp_get_thread_num()].field += n * sizeof(Node);
       //node_allocator.construct(p);
       RT_ASSERT(p != NULL && p != (Node *) (-1));
       return p;
@@ -1560,7 +1560,7 @@ private:
 
     void delete_nodes(Node *p, int n) {
       node_allocator.deallocate(p, n);
-      al[omp_get_thread_num()].field -= n * sizeof(Node);
+      al[ThreadInfo::omp_get_thread_num()].field -= n * sizeof(Node);
     }
 
     void safe_delete_nodes(Node *p, int n) {
@@ -1573,7 +1573,7 @@ private:
 
     Item *new_items(int n) {
       Item *p = item_allocator.allocate(n);
-      al[omp_get_thread_num()].field += n * sizeof(Item);
+      al[ThreadInfo::omp_get_thread_num()].field += n * sizeof(Item);
       for (int i = 0; i < n; ++i) {
         p[i].typeVersionLockObsolete.store(0b100);
         p[i].entry_type = 0;
@@ -1584,7 +1584,7 @@ private:
 
     void delete_items(Item *p, int n) {
       item_allocator.deallocate(p, n);
-      al[omp_get_thread_num()].field -= n * sizeof(Item);
+      al[ThreadInfo::omp_get_thread_num()].field -= n * sizeof(Item);
     }
 
     /// build an empty tree
@@ -1618,7 +1618,7 @@ private:
       RT_ASSERT(key1 < key2);
 
       Node *node = NULL;
-      if (pending_two[omp_get_thread_num()].empty()) {
+      if (pending_two[ThreadInfo::omp_get_thread_num()].empty()) {
         node = new_nodes(1);
         node->is_two = 1;
         node->build_size = 2;
@@ -1629,8 +1629,8 @@ private:
         node->num_items = 8;
         node->items = new_items(node->num_items);
       } else {
-        node = pending_two[omp_get_thread_num()].top();
-        pending_two[omp_get_thread_num()].pop();
+        node = pending_two[ThreadInfo::omp_get_thread_num()].top();
+        pending_two[ThreadInfo::omp_get_thread_num()].pop();
 
       }
       RT_ASSERT(node->build_size == 2);
@@ -2758,7 +2758,7 @@ private:
           //node->num_inserts = node->num_insert_to_data = 0;
           for (int i = 0; i < node->num_items; i++) node->items[i].typeVersionLockObsolete.store(0b100);;
           for (int i = 0; i < node->num_items; i++) node->items[i].entry_type = 0;
-          pending_two[omp_get_thread_num()].push(node);
+          pending_two[ThreadInfo::omp_get_thread_num()].push(node);
         } else {
           delete_items(node->items, node->num_items);
           delete_nodes(node, 1);
